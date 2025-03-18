@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="{% static 'chroma_app/js/main.js' %}" defer></script>
+</head>
+<body>
+    <h1>Chat</h1>
+    
+    <form id="upload-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="pdf_file" required>
+        <button type="submit">Upload Document</button>
+    </form>
+    
+    <form id="query-form" method="post">
+        {% csrf_token %}
+        <textarea name="prompt" rows="4" cols="50" placeholder="Enter your query here..." required></textarea>
+        <button type="submit">Submit Query</button>
+    </form>
+
+    <div>
+        <h2>Response:</h2>
+        <p id="bot-response">{{ bot_response }}</p>
+        <p id="similarity-check-result">{{ similarity_check_result }}</p>
+    </div>
+</body>
+</html>

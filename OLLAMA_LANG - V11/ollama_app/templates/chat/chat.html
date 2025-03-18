@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'chat/chat.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'chat/loader.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Chatbot</h1>
+        
+        <!-- Form for query and model inputs -->
+        <form id="query-form">
+            <input type="text" id="query_text" name="query_text" placeholder="Enter your query" required>
+            <input type="text" id="ollama_model" name="ollama_model" placeholder="Enter Ollama model (optional)" value="phi3:mini">
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Form for document upload -->
+        <form id="document-form" enctype="multipart/form-data">
+            <label class="custom-file-upload">
+                <input type="file" id="document_file" name="document_file" required />
+                <span class="file-label">Choose File</span>
+            </label>
+            <button type="submit">Add Document</button>
+        </form>
+
+        <div class="response-section">
+            <div id="similarity-check" class="similarity-check">
+                <h2>Query Result for Similarity Check:</h2>
+                <div id="similarity-check-content">
+                    <div class="loader"></div>
+                    Waiting for similarity check result...
+                </div>
+            </div>
+            <div id="ollama-response" class="ollama-response">
+                <h2>Ollama Response:</h2>
+                <div id="ollama-response-content">
+                    <div class="loader"></div>
+                    Waiting for Ollama response...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission for queries
+        document.getElementById('query-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get the input values
+            const queryText = document.getElementById('query_text').value;
+            const ollamaModel = document.getElementById('ollama_model').value;
+
+            // Show loaders
+            document.getElementById('similarity-check-content').innerHTML = '<div class="loader"></div> Waiting for similarity check result...';
+            document.getElementById('ollama-response-content').innerHTML = '<div class="loader"></div> Waiting for Ollama response...';
+
+            // Fetch similarity check results
+            fetch('/fetch-similarity-check/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken') // CSRF token for Django
+                },
+                body: new URLSearchParams({ 'query_text': queryText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('similarity-check-content').textContent = 'Error fetching similarity check results.';
+                } else {
+                    document.getElementById('similarity-check-content').textContent = JSON.stringify(data.similarity_check_result, null, 2);
+                    
+                    // Fetch Ollama response after similarity check
+                    return fetch('/fetch-ollama-response/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': getCookie('csrftoken') // CSRF token for Django
+                        },
+                        body: new URLSearchParams({
+                            'query_text': queryText,
+                            'ollama_model': ollamaModel
+                        })
+                    });
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('ollama-response-content').textContent = 'Error fetching Ollama response.';
+                } else {
+                    document.getElementById('ollama-response-content').textContent = data.bot_response;
+                }
+            })
+            .catch(error => {
+                document.getElementById('similarity-check-content').textContent = 'Error fetching similarity check results.';
+                document.getElementById('ollama-response-content').textContent = 'Error fetching Ollama response.';
+            });
+        });
+
+        // Handle form submission for document upload
+        document.getElementById('document-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get the file input
+            const formData = new FormData();
+            formData.append('document_file', document.getElementById('document_file').files[0]);
+
+            // Upload document
+            fetch('/add-document/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // CSRF token for Django
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error adding document.');
+                } else {
+                    alert('Document added successfully.');
+                }
+            })
+            .catch(error => {
+                alert('Error adding document.');
+            });
+        });
+
+        // Function to get CSRF token for AJAX requests
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

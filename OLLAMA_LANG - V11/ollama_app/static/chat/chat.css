@@ -1,0 +1,124 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  max-width: 800px;
+  width: 90%;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 25px;
+  font-size: 2.5rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+input[type="text"], 
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus {
+  border-color: #007BFF;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+}
+
+button {
+  background-color: #007BFF;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Custom File Upload Styling */
+.custom-file-upload {
+  display: inline-block;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #ff0000;
+  color: #ffffff;
+  border-radius: 6px;
+  transition: background-color 0.3s, transform 0.2s;
+  text-align: center;
+}
+
+.custom-file-upload:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.custom-file-upload input[type="file"] {
+  display: none; /* Hide the default file input */
+}
+
+.file-label {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  line-height: 24px; /* Match the height of the button */
+}
+
+.response-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.similarity-check, .ollama-response {
+  flex: 1;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.similarity-check h2, .ollama-response h2 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+pre {
+  background: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 400px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  border: 1px solid #ccc;
+}
